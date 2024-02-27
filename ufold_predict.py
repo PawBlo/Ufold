@@ -143,7 +143,7 @@ def type_pairs(pairs, sequence):
 
 
 def model_eval_all_test(contact_net,test_generator):
-    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     contact_net.train()
     result_no_train = list()
     result_no_train_shift = list()
@@ -202,10 +202,10 @@ def model_eval_all_test(contact_net,test_generator):
         ct_dict_all,dot_file_dict,tertiary_bp = get_ct_dict_fast(map_no_train,batch_n,ct_dict_all,dot_file_dict,seq_ori.cpu().squeeze(),seq_name[0])
         #ct_dict_all,dot_file_dict = get_ct_dict_fast((contacts>0.5).float(),batch_n,ct_dict_all,dot_file_dict,seq_ori.cpu().squeeze(),seq_name[0])
         ## draw plot section
-        if not args.nc:
-            subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiate.png', '-algorithm', 'radiate', '-resolution', '8.0', '-bpStyle', 'lw'], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
-        else:
-            subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiatenew.png', '-algorithm', 'radiate', '-resolution', '8.0', '-bpStyle', 'lw','-auxBPs', tertiary_bp], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
+        # if not args.nc:
+        #     subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiate.png', '-algorithm', 'radiate', '-resolution', '8.0', '-bpStyle', 'lw'], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
+        # else:
+        #     subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiatenew.png', '-algorithm', 'radiate', '-resolution', '8.0', '-bpStyle', 'lw','-auxBPs', tertiary_bp], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
         #subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiate_ground_truth.png', '-algorithm', 'radiate', '-resolution', '8.0', '-bpStyle', 'lw'], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
         #subprocess.Popen(["java", "-cp", "VARNAv3-93.jar", "fr.orsay.lri.varna.applications.VARNAcmd", '-i', 'results/save_ct_file/' + seq_name[0].replace('/','_') + '.ct', '-o', 'results/save_varna_fig/' + seq_name[0].replace('/','_') + '_radiate_ground_truthnew.png', '-algorithm', 'naview', '-resolution', '18.0', '-bpStyle', 'lw','-auxBPs', tertiary_bp], stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0]
         #pdb.set_trace()
@@ -270,7 +270,7 @@ def model_eval_all_test(contact_net,test_generator):
 
 def main():
     torch.multiprocessing.set_sharing_strategy('file_system')
-    torch.cuda.set_device(1)
+    torch.cuda.set_device(0)
 
     print('Welcome using UFold prediction tool!!!')
 
@@ -311,7 +311,7 @@ def main():
 
     #pdb.set_trace()
     print('==========Start Loading Pretrained Model==========')
-    contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:1'))
+    contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:0'))
     print('==========Finish Loading Pretrained Model==========')
     # contact_net = nn.DataParallel(contact_net, device_ids=[3, 4])
     contact_net.to(device)

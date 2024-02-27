@@ -41,7 +41,7 @@ class RNASSDataGenerator(object):
             self.data = self.upsampling_data_new()
         self.data_x = np.array([instance[0] for instance in self.data])
         self.data_y = np.array([instance[1] for instance in self.data])
-        self.pairs = np.array([instance[-1] for instance in self.data])
+        self.pairs = [instance[-1] for instance in self.data]
         #pdb.set_trace()
         self.seq_length = np.array([instance[2] for instance in self.data])
         self.len = len(self.data)
@@ -224,7 +224,7 @@ class RNASSDataGenerator_input(object):
                     'seq ss_label length name pairs')
         input_file = open(os.path.join(data_dir, '%s.txt' % self.split),'r').readlines()
         self.data_name = np.array([itm.strip()[1:] for itm in input_file if itm.startswith('>')])
-        self.seq = [itm.strip().upper().replace('T','U') for itm in input_file if itm.upper().startswith(('A','U','C','G','T'))]
+        self.seq = [itm.strip().upper().replace('T','U') for itm in input_file if not itm.upper().startswith(('>'))]
         self.len = len(self.seq)
         self.seq_length = np.array([len(item) for item in self.seq])
         self.data_x = np.array([self.one_hot_600(item) for item in self.seq])
@@ -878,11 +878,11 @@ def l_mask(inp, seq_len):
     return np.triu(mask, 2)
 
 def creatmat(data, device=None):
-    if device==None:
-        device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
+    # if device==None:
+    #     device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
     with torch.no_grad():
-        data = ''.join(['AUCG'[list(d).index(1)] for d in data])
+        data = ''.join(['AUCG'[list(d).index(1)] if 1 in d else 'N' for d in data])
         paired = defaultdict(int, {'AU':2, 'UA':2, 'GC':3, 'CG':3, 'UG':0.8, 'GU':0.8})
 
         mat = torch.tensor([[paired[x+y] for y in data] for x in data]).to(device)
@@ -891,6 +891,7 @@ def creatmat(data, device=None):
         i, j = torch.meshgrid(torch.arange(n).to(device), torch.arange(n).to(device), indexing=None)
         t = torch.arange(30).to(device)
         m1 = torch.where((i[:, :, None] - t >= 0) & (j[:, :, None] + t < n), mat[torch.clamp(i[:,:,None]-t, 0, n-1), torch.clamp(j[:,:,None]+t, 0, n-1)], 0)
+        m1 = m1.type(torch.float32)
         m1 *= torch.exp(-0.5*t*t)
 
         m1_0pad = torch.nn.functional.pad(m1, (0, 1))
@@ -901,6 +902,7 @@ def creatmat(data, device=None):
 
         t = torch.arange(1, 30).to(device)
         m2 = torch.where((i[:, :, None] + t < n) & (j[:, :, None] - t >= 0), mat[torch.clamp(i[:,:,None]+t, 0, n-1), torch.clamp(j[:,:,None]-t, 0, n-1)], 0)
+        m2 = m2.type(torch.float32)
         m2 *= torch.exp(-0.5*t*t)
 
         m2_0pad = torch.nn.functional.pad(m2, (0, 1))
