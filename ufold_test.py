@@ -69,7 +69,7 @@ def get_ct_dict_fast(predict_matrix,batch_num,ct_dict,dot_file_dict,seq_embeddin
 # randomly select one sample from the test set and perform the evaluation
 
 def model_eval_all_test(contact_net,test_generator):
-    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     contact_net.train()
     result_no_train = list()
     result_no_train_shift = list()
@@ -323,7 +323,7 @@ def main():
     #pdb.set_trace()
     print('==========Start Loading==========')
     if torch.cuda.is_available():
-        contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:1'))
+        contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:0'))
     else:
         contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cpu'))
 
