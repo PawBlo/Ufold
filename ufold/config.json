@@ -8,7 +8,8 @@
 	"rho_per_position": "matrix",
 	"data_type": "rnastralign_all_600",
 	"model_type": "pretrained",
-	"epoches_first": 100, 
+	"epoches_first": 2, 
 	"step_gamma": 1,
-	"k": 1
+	"k": 1,
+	"path_to_model" : "/home/pawblo/Desktop/mantczak-6/my/ufold_train_1.pt", 
 }
