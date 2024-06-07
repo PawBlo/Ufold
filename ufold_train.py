@@ -119,7 +119,7 @@ def main():
     
     #pdb.set_trace()
     
-    os.environ["CUDA_VISIBLE_DEVICES"]= 0
+    os.environ["CUDA_VISIBLE_DEVICES"]= config.gpu
     
     d = config.u_net_d
     BATCH_SIZE = config.batch_size_stage_1
