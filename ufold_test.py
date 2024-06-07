@@ -187,13 +187,16 @@ def model_eval_all_test(contact_net,test_generator):
     ct_file.close()
     '''
     
-    nt_exact_p,nt_exact_r,nt_exact_f1 = zip(*result_no_train)
+    nt_exact_p,nt_exact_r,nt_exact_f1, specificity, inf = zip(*result_no_train)
     print(nt_exact_p)
     #pdb.set_trace()
-    print('Average testing F1 score with pure post-processing: ', np.average(nt_exact_f1))
-    print('Average testing precision with pure post-processing: ', np.average(nt_exact_p))
-    print('Average testing recall with pure post-processing: ', np.average(nt_exact_r))
-
+    # print('Average testing F1 score with pure post-processing: ', np.average(nt_exact_f1))
+    # print('Average testing precision with pure post-processing: ', np.average(nt_exact_p))
+    # print('Average testing recall with pure post-processing: ', np.average(nt_exact_r))
+    print("PPV: ",  np.average(nt_exact_p))
+    print('TPR: ',np.average(nt_exact_r))
+    print('TNR: ', np.average(specificity))
+    print('INF: ', np.average(inf))
 
     #with open('/data2/darren/experiment/ufold/results/sample_result.pickle','wb') as f:
     #    pickle.dump(result_dict,f)

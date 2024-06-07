@@ -334,19 +334,24 @@ def evaluate_shifted(pred_a, true_a):
     return precision, recall, f1_score
 
 def evaluate_exact_new(pred_a, true_a, eps=1e-11):
+    pred_tensor = torch.Tensor(pred_a)
+    true_tensor = torch.Tensor(true_a)
     tp_map = torch.sign(torch.Tensor(pred_a)*torch.Tensor(true_a))
     tp = tp_map.sum()
     pred_p = torch.sign(torch.Tensor(pred_a)).sum()
     true_p = true_a.sum()
     fp = pred_p - tp
     fn = true_p - tp
+    tn = torch.sum((1 - pred_tensor) * (1 - true_tensor))
     # recall = tp/(tp+fn)
     # precision = tp/(tp+fp)
     # f1_score = 2*tp/(2*tp + fp + fn)
     recall = (tp + eps)/(tp+fn+eps)
     precision = (tp + eps)/(tp+fp+eps)
     f1_score = (2*tp + eps)/(2*tp + fp + fn + eps)
-    return precision, recall, f1_score
+    specificity = (tn + eps) / (tn + fp + eps)
+    inf = (precision * recall) ** 0.5
+    return precision, recall, f1_score, specificity, inf
 
 def evaluate_exact(pred_a, true_a):
     tp_map = torch.sign(torch.Tensor(pred_a)*torch.Tensor(true_a))
