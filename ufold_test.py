@@ -186,7 +186,9 @@ def model_eval_all_test(contact_net,test_generator):
         ct_file.write('\n')
     ct_file.close()
     '''
+    
     nt_exact_p,nt_exact_r,nt_exact_f1 = zip(*result_no_train)
+    print(nt_exact_p)
     #pdb.set_trace()
     print('Average testing F1 score with pure post-processing: ', np.average(nt_exact_f1))
     print('Average testing precision with pure post-processing: ', np.average(nt_exact_p))
@@ -201,7 +203,8 @@ def model_eval_all_test(contact_net,test_generator):
 
 def main():
     torch.multiprocessing.set_sharing_strategy('file_system')
-    torch.cuda.set_device(0)
+    if torch.cuda.is_available():
+        torch.cuda.set_device(0)
     
     #pdb.set_trace()
     
@@ -224,9 +227,9 @@ def main():
     #MODEL_SAVED = '/data2/darren/experiment/ufold/models_ckpt/final_model/unet_train_on_TR0_33.pt'
     #MODEL_SAVED = '/data2/darren/experiment/ufold/models_ckpt/final_model/unet_train_on_RNAlign_49.pt'
     if test_file not in ['TS1','TS2','TS3']:
-        MODEL_SAVED = 'models/ufold_train.pt'    
+        MODEL_SAVED = config.path_to_model    
     else:
-        MODEL_SAVED = 'models/ufold_train_pdbfinetune.pt'
+        MODEL_SAVED = config.path_to_model
     #MODEL_SAVED = '/data2/darren/experiment/ufold/models_ckpt/final_model/unet_train_on_TR0andMXUnet_99.pt'
     #MODEL_SAVED = '/data2/darren/experiment/ufold/models_ckpt/final_model/unet_train_on_TR0bpnewOriuseMXUnet_96.pt'
     #MODEL_SAVED = '/data2/darren/experiment/ufold/models_ckpt/final_model/unet_train_on_TR0_extract_99.pt'
@@ -319,7 +322,11 @@ def main():
     
     #pdb.set_trace()
     print('==========Start Loading==========')
-    contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:1'))
+    if torch.cuda.is_available():
+        contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cuda:1'))
+    else:
+        contact_net.load_state_dict(torch.load(MODEL_SAVED,map_location='cpu'))
+
     print('==========Finish Loading==========')
     # contact_net = nn.DataParallel(contact_net, device_ids=[3, 4])
     contact_net.to(device)

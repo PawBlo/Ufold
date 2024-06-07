@@ -105,7 +105,8 @@ def train(contact_net,train_merge_generator,epoches_first):
             torch.save(contact_net.state_dict(),  f'../ufold_train_{epoch}.pt')
 
 def main():
-    torch.cuda.set_device(0)
+    if torch.cuda.is_available():
+        torch.cuda.set_device(0)
     
     args = get_args()
     
